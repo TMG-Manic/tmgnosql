@@ -1,0 +1,11 @@
+{
+  "name": "tmgnosql",
+  "version": "1.0.0",
+  "description": "Server-side dependencies for TMG NoSQL Core",
+  "main": "database.js",
+  "dependencies": {
+    "mongodb": "^5.9.2"
+  },
+  "author": "TMG",
+  "license": "MIT"
+}

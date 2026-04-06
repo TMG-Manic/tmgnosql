@@ -1,5 +1,3 @@
-# tmgnosql
-The core part of the TMG-Core Framework. (WIP)
 =======
 # 🧠 QBCore Framework: TMG NoSQL Mainframe Core (`tmgnosql`)
 

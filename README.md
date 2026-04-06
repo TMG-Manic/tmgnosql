@@ -56,10 +56,6 @@ To harness the power of the Mainframe in your own scripts, utilize these globall
 * `exports['tmgnosql']:SaveToCollection(collection, filter, data)`: Upserts (Updates if exists, Inserts if missing).
 * `exports['tmgnosql']:BulkUpdate(collection, operations)`: Executes high-velocity batch updates.
 
-### 🛡️ Core Utilities
-* `exports['tmgnosql']:SaveBanNoSQL(license, data)`: Bypasses SQL to instantly blacklist an exploiter.
-* `exports['tmgnosql']:BulkDeleteCharacter(citizenid)`: Surgically deletes a Citizen across 11 different collections instantly.
-
 ---
 
 ## ⚙️ Installation & Requirements

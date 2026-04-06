@@ -18,7 +18,7 @@ Transitioning an entire framework from SQL to NoSQL usually requires rewriting t
 * **Native Fallbacks:** Shared data (`QBCore.Shared.Items`, `Jobs`, `Gangs`) is globally cached and served natively, allowing standard QBCore resources to run alongside the NoSQL infrastructure without throwing "nil value" errors.
 
 ### 💾 Volatile Player Caching & Auto-Saves (`player.js`)
-Standard QBCore saves player data constantly—every time an item moves, money changes, or metadata updates, a heavy SQL `UPDATE` query is fired, bottlenecking the server thread.
+Standard QBCore saves player data constantly every time an item moves, money changes, or metadata updates, a heavy SQL `UPDATE` query is fired, bottlenecking the server thread.
 * **Object-Oriented RAM State:** When a player authenticates, their entire BSON profile is loaded into an active `TMGPlayer` object in server memory.
 * **Dirty State Management:** Modifications simply flag the object as `isDirty = true`. A decentralized background loop sweeps through the RAM cache every 5 minutes (300,000ms), batch-saving only the modified profiles to the database natively.
 * **Crash-Proof Disconnects:** If a player drops (`playerDropped`), the Mainframe instantly forces a localized save, ensuring zero rollback.

@@ -1,4 +1,4 @@
-=======
+========
 # 🧠 QBCore Framework: TMG NoSQL Mainframe Core (`tmgnosql`)
 
 [![Architecture](https://img.shields.io/badge/Architecture-MongoDB%20%2F%20BSON-blue.svg)]()

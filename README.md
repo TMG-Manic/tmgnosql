@@ -1,84 +1,75 @@
-# 🧠 QBCore Framework: TMG NoSQL Mainframe Core (`tmgnosql`)
+# 🧠 QBCore Framework: TMG Mainframe Stabilized Core (`core.js`)
 
-[![Architecture](https://img.shields.io/badge/Architecture-MongoDB%20%2F%20BSON-blue.svg)]()
-[![Performance](https://img.shields.io/badge/Performance-Asynchronous%20Caching-brightgreen.svg)]()
-[![Compatibility](https://img.shields.io/badge/Compatibility-QBCore%20Bridge-orange.svg)]()
+[![Architecture](https://img.shields.io/badge/Architecture-MongoDB%20Legacy%20Driver-blue.svg)]()
+[![Stability](https://img.shields.io/badge/Stability-Fault--Tolerant-brightgreen.svg)]()
+[![Security](https://img.shields.io/badge/Security-Atomic%20Protection%20Gate-red.svg)]()
 
-Welcome to the **TMG NoSQL Mainframe Core**. This is the beating heart of the entire TMG Mainframe ecosystem. This resource completely replaces legacy relational SQL drivers (`oxmysql`, `ghmattimysql`) with a hyper-optimized, asynchronous **MongoDB Node.js Architecture**. 
+Welcome to the **TMG Mainframe Stabilized Core** (`core.js`). This repository contains the foundational NoSQL driver integration for the TMG Mainframe ecosystem. It acts as the direct, fault-tolerant bridge between the FiveM server environment and the MongoDB cluster.
 
-By utilizing document-based BSON storage, atomic operators (`$inc`, `$set`, `$push`), and aggressive server-side RAM caching, the Mainframe eradicates database deadlocks, JSON truncation errors, and query timeouts that plague high-population FiveM servers.
+Standard SQL wrappers (and even basic NoSQL implementations) are prone to catastrophic failures: a single poorly formatted Lua query can crash the entire Node.js database driver, taking the server offline. The **TMG Mainframe Core** is engineered with an aggressive "Zero-Crash" philosophy, featuring automated query sanitization, atomic protection gates, and automated BSON indexing.
 
 ---
 
 ## 🏆 Why This Upgrade is Superior: The Architecture Leap
 
-### 💾 Volatile Player Caching & Auto-Saves (`player.js`)
-Standard QBCore saves player data constantly every time an item moves, money changes, or metadata updates, a heavy SQL `UPDATE` query is fired, bottlenecking the server thread.
-* **Object-Oriented RAM State:** When a player authenticates, their entire BSON profile is loaded into an active `TMGPlayer` object in server memory.
-* **Dirty State Management:** Modifications simply flag the object as `isDirty = true`. A decentralized background loop sweeps through the RAM cache every 5 minutes (300,000ms), batch-saving only the modified profiles to the database natively.
-* **Crash-Proof Disconnects:** If a player drops (`playerDropped`), the Mainframe instantly forces a localized save, ensuring zero rollback.
+### 🛡️ The Atomic Protection Gate (`sanitizeUpdate`)
+The most dangerous mistake a developer can make in MongoDB is executing an update without an atomic operator (like `$set` or `$inc`). Doing so will **remove the entire document**, replacing all saved data with just the single field provided.
+* **Intelligent Interception:** The Mainframe intercepts every single `UpdateOne`, `UpdateMany`, and `UpdateAll` payload before it hits the database.
+* **Auto-Correction:** The `sanitizeUpdate` function parses the object keys. If it detects that the developer forgot the `$set` operator (e.g., they passed `{ progress: 10 }`), the Mainframe dynamically wraps the payload into `{ "$set": { progress: 10 } }`.
+* **Zero Data Loss:** This completely eliminates the risk of accidental document erasure caused by sloppy Lua scripting in downstream resources.
 
-### 👻 "Ghost Profile" DB Saturation (`setup_db.js`)
-Legacy QBCore hardcodes SQL checks (e.g., checking the `bans` table for active bans before letting a player join). If the SQL table is missing, the server halts.
-* **The Mainframe Bypass:** On startup, the Mainframe executes a "Ghost Profile Saturation" pulse. It autonomously constructs the necessary MongoDB collections (`bans`, `players`) and injects a dummy `system_init` document.
-* **Index Enforcement:** It automatically enforces unique BSON indexes (`citizenid: 1`, `id: 1`) to ensure data integrity matches standard SQL primary keys without the relational overhead.
+### 🧬 Bulletproof Query Serialization
+Lua and JavaScript handle empty tables differently. A Lua `{}` often translates to a JavaScript `[]` (Array), which will instantly crash a MongoDB driver expecting a filter object.
+* **Strict Type Enforcement:** Every read/write export (`FetchAll`, `CheckIfExists`, `Find`) forces the incoming query through a strict type-check: `(q && typeof q === 'object' && !Array.isArray(q)) ? q : {}`.
+* **Crash Immunity:** If a broken script passes a `nil` value or an empty array to the database, the Mainframe autonomously corrects it to an empty BSON object, fulfilling the query safely rather than throwing a fatal Node.js exception.
 
-### ⚡ Universal Asynchronous Exports (`main.js` & `database.js`)
-* **Unified API:** Replaces messy SQL syntax with clean, Promise-based exports. Scripts simply call `exports['tmgnosql']:FetchOne` or `exports['tmgnosql']:UpdateMany`.
-* **Bulletproof Queries:** Filter parsing ensures that if a script accidentally passes a nil query, the Mainframe safely converts it into a valid BSON object, preventing query crashes.
+### ⚡ Automated O(1) Index Injection
+Relational SQL databases require manual schema building. If you forget an index, the server will lag as player counts rise.
+* **Self-Optimizing Architecture:** The exact millisecond the Mainframe secures its connection to the MongoDB cluster, it executes automated index creations for the most heavily queried data points: `players.citizenid` and `player_vehicles.plate`.
+* **Sub-Millisecond Lookups:** This guarantees that as your server scales to tens of thousands of character and vehicle documents, fetching a player's profile or checking car ownership remains a lightning-fast `O(1)` operation.
+
+### 🔄 Unified Batch Processors
+* **`performUpdateMany` Handler:** Standardizes how massive batch updates (like the botanical chronometer or vehicle restart scripts) are processed. It catches internal Promise rejections and safely returns a `false` boolean to Lua, ensuring the FiveM server thread never hangs waiting for a dead database callback.
 
 ---
 
 ## 📊 Technical Comparison Matrix
 
-| Feature / Metric | Legacy SQL Wrappers (`oxmysql`) | TMG NoSQL Mainframe |
+| Feature / Metric | Standard MongoDB Scripting | TMG Stabilized Core (`core.js`) |
 | :--- | :--- | :--- |
-| **Data Structure** | Relational Tables & `longtext` JSON | Schema-less BSON Documents |
-| **Player Saves** | Sync/Async Overwrites (Constant) | Sweeping `isDirty` RAM Cache (5 min) |
-| **Nested Updates** | Decode > Edit > Encode > Save | Atomic Dot-Notation (`$set: {"a.b": 1}`) |
-| **QBCore Support** | Native Dependency | Transparent Interception Bridge |
-| **Indexing** | Rigid Table Schemas | Dynamic Index Creation |
+| **Missing `$set` Operator** | **Removes entire document** | Autonomously wrapped & saved |
+| **Empty Lua Table `{}`** | Crashes Node.js Driver | Safely cast to Object `{}` |
+| **Query Error Handling** | Unhandled Promise Rejections | Try/Catch with Safe Booleans |
+| **Index Management** | Manual (Compass/CLI) | Auto-Injected on Startup |
+| **Upsert Logic** | Requires complex syntax | Streamlined `SaveToCollection` |
 
 ---
 
-## 🛠️ The Mainframe Export API
+## 🛠️ The Mainframe Core API
 
-To harness the power of the Mainframe in your own scripts, utilize these globally accessible exports:
+This file establishes the global baseline for all TMG database interactions.
 
-### 📥 Data Retrieval
-* `exports['tmgnosql']:FetchOne(collection, query, projection)`: Returns a single BSON document.
-* `exports['tmgnosql']:FetchAll(collection, query)`: Streams a full array of matching documents.
-* `exports['tmgnosql']:CheckIfExists(collection, query)`: Returns a high-speed boolean without downloading the document.
+### 📥 Read Operations
+* `exports['tmgnosql']:FetchOne(col, query)`: Retrieves a single document safely.
+* `exports['tmgnosql']:FetchAll(col, query)`: Returns an array of all matching documents (automatically sanitizes array inputs).
+* `exports['tmgnosql']:CheckIfExists(col, query)`: High-performance `countDocuments` check with a limit of 1.
 
-### 📤 Data Mutation
-* `exports['tmgnosql']:InsertDocument(collection, data)`: Safely inserts a new document.
-* `exports['tmgnosql']:UpdateOne(collection, filter, update)`: Uses atomic operators (`$inc`, `$set`) for targeted edits.
-* `exports['tmgnosql']:SaveToCollection(collection, filter, data)`: Upserts (Updates if exists, Inserts if missing).
-* `exports['tmgnosql']:BulkUpdate(collection, operations)`: Executes high-velocity batch updates.
+### 📤 Write Operations
+* `exports['tmgnosql']:UpdateOne(col, filter, update, options)`: Modifies a single document through the Atomic Protection Gate.
+* `exports['tmgnosql']:UpdateMany(col, filter, update, options)`: Processes thousands of documents simultaneously.
+* `exports['tmgnosql']:SaveToCollection(col, filter, data)`: The ultimate "Upsert" wrapper—updates if the document exists, inserts if it doesn't, automatically enforcing `$set`.
 
 ---
 
 ## ⚙️ Installation & Requirements
 
-1. **MongoDB Engine:** You **MUST** install [MongoDB Community Server](https://www.mongodb.com/try/download/community) on your host machine.
-2. **Node Dependencies:** Navigate to `resources/[tmg]/tmgnosql/server` and run:
-   ```bash
-   npm install
-3. Server Configuration: Add the following Convars to your server.cfg BEFORE starting the resource:
-```bash
-set mongodb_uri "mongodb://localhost:27017"
-set mongodb_db "TMG_Mainframe"
-
-ensure tmgnosql
-ensure qb-core
-Note: tmgnosql must be started before QBCore to establish the bridge.
-```
+1. **Environment:** Designed for the Node.js runtime within the FiveM server architecture.
+2. **Dependencies:** Requires the legacy `mongodb` package (`const MongoDB = require('mongodb')`). Ensure your `package.json` reflects the correct driver version.
+3. **Initialization:** This file must be loaded first in your `fxmanifest.lua` `server_scripts` array to ensure the `db` variable and global connection states are established before `main.js` or `bridge.js` attempt queries.
 
 ## 🤝 Credits & Licensing
-* **Original Heist Logic:** [QBCore Framework Team](https://github.com/qbcore-framework)
-* **NoSQL Architecture & Security Refactor:** TMG Mainframe Team
+* **NoSQL Architecture & Stabilized Driver Refactor:** TMG Mainframe Team
 * **License:** GPL-3.0
-* **Inspired by:** https://github.com/nbredikhin/fivem-mongodb
 
 ---
-*Disclaimer: This is a custom, highly modified NoSQL refactor and is not officially affiliated with or supported by the core QBCore Framework Team. Please do not submit issues regarding this version to the official QBCore repositories.*
+*Disclaimer: This is a highly modified, fault-tolerant database core designed exclusively for the TMG Mainframe ecosystem. Do not replace standard SQL drivers with this without fully understanding the BSON document architecture.*

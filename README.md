@@ -12,11 +12,6 @@ By utilizing document-based BSON storage, atomic operators (`$inc`, `$set`, `$pu
 
 ## 🏆 Why This Upgrade is Superior: The Architecture Leap
 
-### 🌉 The QBCore Translation Bridge (`bridge.js`)
-Transitioning an entire framework from SQL to NoSQL usually requires rewriting thousands of files. The Mainframe solves this with the Translation Bridge.
-* **Function Interception:** The bridge seamlessly hooks into `QBCore.Functions.GetPlayer` and overrides legacy logic. When a standard script calls `Player.Functions.SetMetaData`, the bridge translates this into an atomic BSON update.
-* **Native Fallbacks:** Shared data (`QBCore.Shared.Items`, `Jobs`, `Gangs`) is globally cached and served natively, allowing standard QBCore resources to run alongside the NoSQL infrastructure without throwing "nil value" errors.
-
 ### 💾 Volatile Player Caching & Auto-Saves (`player.js`)
 Standard QBCore saves player data constantly every time an item moves, money changes, or metadata updates, a heavy SQL `UPDATE` query is fired, bottlenecking the server thread.
 * **Object-Oriented RAM State:** When a player authenticates, their entire BSON profile is loaded into an active `TMGPlayer` object in server memory.

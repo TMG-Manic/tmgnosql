@@ -1,5 +1,3 @@
-// [[ TMG MAIN FRAME - SHARED DATA CACHE ]]
-
 global.SharedData = { Items: {}, Jobs: {}, Gangs: {} };
 
 global.GetSharedInternal = function(type) {

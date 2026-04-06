@@ -1,8 +1,5 @@
-<<<<<<< Updated upstream
 # tmgnosql
 The core part of the TMG-Core Framework. (WIP)
-
-Inspired by: https://github.com/nbredikhin/fivem-mongodb
 =======
 # 🧠 QBCore Framework: TMG NoSQL Mainframe Core (`tmgnosql`)
 
@@ -93,7 +90,7 @@ Note: tmgnosql must be started before QBCore to establish the bridge.
 * **Original Heist Logic:** [QBCore Framework Team](https://github.com/qbcore-framework)
 * **NoSQL Architecture & Security Refactor:** TMG Mainframe Team
 * **License:** GPL-3.0
+* **Inspired by:** https://github.com/nbredikhin/fivem-mongodb
 
 ---
 *Disclaimer: This is a custom, highly modified NoSQL refactor and is not officially affiliated with or supported by the core QBCore Framework Team. Please do not submit issues regarding this version to the official QBCore repositories.*
->>>>>>> Stashed changes

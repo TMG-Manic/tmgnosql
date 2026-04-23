@@ -13,3 +13,6 @@ A high-performance, NoSQL-based core for FiveM, replacing traditional SQL depend
 
 ## Development
 Use exports['TMGNoSQL']:GetPlayer(source) to access the live Player Object.
+
+VIDEO OF IT IN ACTION
+https://www.youtube.com/watch?v=dl9AMzFIVg4

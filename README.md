@@ -37,9 +37,9 @@ Add the following lines to your server.cfg:
 ```
 set mongodb_uri "mongodb://localhost:27017"
 set mongodb_db "TMG_Mainframe"
-```
-ensure TMGNoSQL
 
+ensure TMGNoSQL
+```
 ## 💻 Example Usage
 
 ### Inserting Data (Post to DB)

@@ -26,7 +26,7 @@
 
 ### 2. Setup
 1. Clone the repository into your `resources` folder.
-2. Navigate to the `server/` folder of the resource.
+2. Navigate to the tmgnosql folder of the resource.
 3. Open your terminal in that directory and run:
    ```bash
    npm install
